@@ -1,0 +1,7 @@
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
+
+#define BONUS_POINTS_SCORE 10000
+#define MAX_LIVES 10
+
+#endif // CONSTANTS_H

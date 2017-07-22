@@ -13,7 +13,7 @@
 
 float missileSpeed = 20.0f;
 
-Missile::Missile(sf::Vector2f startPos, float direction) : Entity(), range(20) {
+Missile::Missile(sf::Vector2f startPos, float direction) : Entity(), range(30) {
     angle = direction;
     myTextureLocation = "Resources/Missile.png";
     velocity = GeoMaths::rotateVector(velocity, angle)*missileSpeed;

@@ -21,6 +21,7 @@ public:
 	Entity();
 	virtual ~Entity();
 	virtual void tick(int);
+	void destroyed();
 	float getSpeed();
 	sf::Vector2f getVelocity();
 	void setVelocity(sf::Vector2f);
@@ -35,9 +36,9 @@ public:
 	void setAngle(float);
 	sf::Vector2f getPosition();
 	float getCollisionRadius();
-	void destroyed();
 	bool isAlive();
 	EntityType getType();
+    int getScoreValue();
 
 protected:
 	void setupSprite(sf::Vector2f);
@@ -52,6 +53,7 @@ protected:
 	sf::Texture myTexture;
 	EntityType type;
 	bool alive;
+    int scoreValue;
 
 };
 

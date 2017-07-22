@@ -22,12 +22,10 @@ public:
 	int respawnShip(sf::Vector2f);
 
 private:
-	void passiveDecceleration(int);
-
-private:
 	sf::Vector2f getNosePos();
 	void createShip(sf::Vector2f);
 	void turn(int);
+    void passiveDecceleration(int);
 };
 
 #endif /* SHIP_H_ */

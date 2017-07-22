@@ -17,6 +17,7 @@ public:
 public:
 	Asteroid(Size, sf::Vector2f);
 	virtual ~Asteroid();
+    Size getSize();
 
 	static const int spawnRadius = 0;
 

@@ -7,9 +7,11 @@
 
 #include "Ship.h"
 #include "Missile.h"
+#include "GeoMaths.h"
+#include "Constants.h"
+
 #include <math.h>
 #include <iostream>
-#include "GeoMaths.h"
 
 float maxSpeed {-20.0f};
 float deccelerationValue {0.01f};
@@ -94,11 +96,17 @@ sf::Vector2f Ship::getNosePos() {
 }
 
 int Ship::respawnShip(sf::Vector2f startPos) {
+    alive = true;
+    
     if(mySprite.getTexture() == nullptr) {
         setupSprite(startPos);
+    } else {
+        mySprite.setRotation(0);
+        mySprite.setPosition(startPos);
     }
 
 	setAngle(90);
+    velocity *= 0.0f;
 
 	return 0;
 }

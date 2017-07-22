@@ -13,8 +13,17 @@ set (CMAKE_CXX_FLAGS "-Wall -std=c++17")
 # Add the headers
 include_directories(include)
 
-# Set the GLOB command to search for all source and header files in the src directory
-file (GLOB SOURCE_FILES src/*.cpp)
+# Set the source files
+set (SOURCE_FILES
+	src/Asteroid.cpp
+	src/AsteroidsGame.cpp
+	src/Entity.cpp
+	src/GeoMaths.cpp
+	src/MainWindow.cpp
+	src/Missile.cpp
+	src/ScoreKeeper.cpp
+	src/Ship.cpp
+	)
 
 file(COPY ${CMAKE_SOURCE_DIR}/Resources DESTINATION ${PROJECT_BINARY_DIR})
 

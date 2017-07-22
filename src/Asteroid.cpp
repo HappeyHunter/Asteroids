@@ -34,14 +34,17 @@ void Asteroid::setAttributes() {
         case Size::Large :
             myTextureLocation = "Resources/LargeAsteroid.png";
             velocity *= 0.5f;
+            scoreValue = 20;
             break;
         case Size::Medium :
             myTextureLocation = "Resources/MediumAsteroid.png";
-            velocity *= 5.0f;
+            velocity *= 1.0f;
+            scoreValue = 50;
             break;
         case Size::Small :
             myTextureLocation = "Resources/SmallAsteroid.png";
-            velocity *= 10.0f;
+            velocity *= 2.0f;
+            scoreValue = 100;
             break;
     }    
 
@@ -49,3 +52,9 @@ void Asteroid::setAttributes() {
     
     velocity = GeoMaths::rotateVector(velocity, angle);
 }
+
+Asteroid::Size Asteroid::getSize()
+{
+    return mySize;
+}
+

@@ -7,6 +7,7 @@
 
 #define TICK 1
 
+#include "Constants.h"
 #include "MainWindow.h"
 #include "Entity.h"
 #include "Ship.h"
@@ -23,7 +24,6 @@
 Ship shipEntity;
 
 sf::Font aFont;
-sf::Text scoreText("Score: ", aFont);
 
 std::vector<std::unique_ptr<Asteroid>> asteroids;
 std::vector<std::unique_ptr<Missile>> missiles;
@@ -32,10 +32,13 @@ bool reloading = false;
 
 const int asteroidCount = 8;
 
-int score = 0;
-
-MainWindow::MainWindow() {
-	shipCommands.resize(sf::Keyboard::KeyCount, false);
+MainWindow::MainWindow() : centre { (float) gameWidth/2, (float) gameHeight/2} {    
+    sf::Vector2f centreSize {(float) gameWidth/5, (float) gameHeight/5};
+    sf::Vector2f centreRectPos {(float) gameWidth/2-centreSize.x/2, (float) gameHeight/2-centreSize.y/2};
+    
+    spawnArea = sf::Rect<float>(centreRectPos, centreSize);
+    
+    shipCommands.resize(sf::Keyboard::KeyCount, false);
 }
 
 MainWindow::~MainWindow() {
@@ -53,7 +56,6 @@ int MainWindow::runGame() {
 	// Create world stuff
 	createShip();
 	createAsteroids();
-	prepareScore();
 
     // Main loop
 	while (window.isOpen())
@@ -79,9 +81,8 @@ int MainWindow::runGame() {
 
 		executeShipCommands();
 		gameTick();
-
 		checkCollisions();
-		updateScore();
+        score.updateScore();
 		drawEntities(window);
 	}
 
@@ -90,7 +91,6 @@ int MainWindow::runGame() {
 
 void MainWindow::gameTick() {
     // Remove dead things first
-
 
     // Asteroids
     unsigned int i = 0;
@@ -114,12 +114,35 @@ void MainWindow::gameTick() {
 
     // Now tick everything
     // Ship
-    shipEntity.tick(TICK);
+    if(shipEntity.isAlive()) {
+        shipEntity.tick(TICK);
+    } else {
+        // Ship is dead. Wait out the delay, then try to respawn the ship when nothing is in the centre
+        if(spawnDelay <= 0) {
+            if(score.getLivesCount() < 0) {
+                // gameOver();
+            } else if(isSpawnEmpty()) {
+                sf::Vector2f spawnPos;
+
+                spawnPos.x = gameWidth/2;
+                spawnPos.y = gameHeight/2;
+
+                shipEntity.respawnShip(spawnPos);
+                score.respawn();
+            }
+        } else {
+            --spawnDelay;
+        }
+    }
 
     // Asteroids
-    for(unsigned int i = 0; i < asteroids.size(); i++) {
-		asteroids[i]->tick(TICK);
-	}
+    if(asteroids.size() > 0) {
+        for(unsigned int i = 0; i < asteroids.size(); i++) {
+            asteroids[i]->tick(TICK);
+        }
+    } else {
+        createAsteroids();
+    }
 
 	// Missiles
 	for(unsigned int i = 0; i < missiles.size(); i++) {
@@ -143,12 +166,10 @@ int MainWindow::createAsteroids() {
 
 	for(int i = 0; i<asteroidCount; i++) {
 		sf::Vector2f startPos;
-
+        do {
 		startPos.x = rand() % gameWidth;
 		startPos.y = rand() % gameHeight;
-
-		startPos.x = rand() % gameWidth;
-		startPos.y = rand() % gameHeight;
+        } while(spawnArea.contains(startPos));
 
 		asteroids.emplace_back(new Asteroid(Asteroid::Large, startPos));
 	}
@@ -157,14 +178,17 @@ int MainWindow::createAsteroids() {
 }
 
 void MainWindow::processKeyPress(sf::Event event) {
-	if(event.key.code == sf::Keyboard::Space && !reloading) {
-		missiles.emplace_back(new Missile(shipEntity.getPosition(), shipEntity.getAngle()+180));
-        reloading = true;
-	} else if(event.key.code == sf::Keyboard::BackSpace) {
-		resetGame();
-	} else if(event.key.code != sf::Keyboard::Unknown){
-        shipCommands[event.key.code] = true;
-	}
+    
+    if(shipEntity.isAlive()) {
+        if(event.key.code == sf::Keyboard::Space && !reloading) {
+            missiles.emplace_back(new Missile(shipEntity.getPosition(), shipEntity.getAngle()+180));
+            reloading = true;
+        } else if(event.key.code == sf::Keyboard::BackSpace) {
+            resetGame();
+        } else if(event.key.code != sf::Keyboard::Unknown) {
+            shipCommands[event.key.code] = true;
+        }
+    }
 }
 
 void MainWindow::processKeyRelease(sf::Event event) {
@@ -179,33 +203,40 @@ void MainWindow::drawEntities(sf::RenderWindow& window) {
 	window.clear();
 
 	for(unsigned int i = 0; i < asteroids.size(); i++) {
-		window.draw(asteroids[i]->getSprite());
+		drawEntity(window, *asteroids[i]);
 	}
 
 	for(unsigned int i = 0; i < missiles.size(); i++) {
-		window.draw(missiles[i]->getSprite());
+		drawEntity(window, *missiles[i]);
 	}
 
-	window.draw(shipEntity.getSprite());
+	drawEntity(window, shipEntity);
 
-	window.draw(scoreText);
+	score.drawScore(window);
 
 	window.display();
 }
 
+void MainWindow::drawEntity(sf::RenderWindow& window, Entity& entity)
+{
+    if(entity.isAlive()) {
+        window.draw(entity.getSprite());
+    }
+}
+
 void MainWindow::executeShipCommands() {
-	if(shipCommands[sf::Keyboard::Up]) {
-		shipEntity.accelerate();
-	}
-	if(shipCommands[sf::Keyboard::Down]) {
-		shipEntity.deccelerate();
-	}
-	if(shipCommands[sf::Keyboard::Left]) {
-		shipEntity.turnLeft();
-	}
-	if(shipCommands[sf::Keyboard::Right]) {
-		shipEntity.turnRight();
-	}
+    if(shipCommands[sf::Keyboard::Up]) {
+        shipEntity.accelerate();
+    }
+    if(shipCommands[sf::Keyboard::Down]) {
+        shipEntity.deccelerate();
+    }
+    if(shipCommands[sf::Keyboard::Left]) {
+        shipEntity.turnLeft();
+    }
+    if(shipCommands[sf::Keyboard::Right]) {
+        shipEntity.turnRight();
+    }
 }
 
 void MainWindow::checkCollisions() {
@@ -214,11 +245,9 @@ void MainWindow::checkCollisions() {
         if(GeoMaths::distanceBetweenPoints(asteroids[i]->getPosition(), shipEntity.getPosition())<shipEntity.getCollisionRadius()+asteroids[i]->getCollisionRadius()
 					&& shipEntity.isAlive()
 					&& asteroids[i]->isAlive()) {
-            // Whatever happens when the ship dies
-            asteroids[i]->destroyed();
+            // Ship is destroyed
             shipEntity.destroyed();
             
-            executeDestroyAction(*asteroids[i]);
             executeDestroyAction(shipEntity);
         }
     }
@@ -232,51 +261,67 @@ void MainWindow::checkCollisions() {
 				// Missile and asteroid are dead
                 missiles[i]->destroyed();
                 asteroids[j]->destroyed();
+            
                 executeDestroyAction(*asteroids[j]);
 			}
 		}
 	}
 }
 
-void MainWindow::executeDestroyAction(Entity& destroyedEntity) {
+void MainWindow::executeDestroyAction(Entity& destroyedEntity) {    
+    
 	switch(destroyedEntity.getType()){
 	case Entity::Asteroid: // Asteroid hit
-		//increase score
-		//splitLargeAsteroid(position);
-		break;
-	case Entity::Missile: //Medium asteroid hit
-		//increase score by 1
-		//split
-		//splitMediumAsteroid(position);
+        score.increaseScore(destroyedEntity.getScoreValue());
+		splitAsteroid(destroyedEntity.getPosition(), destroyedEntity);
 		break;
 	case Entity::Ship: //Ship hit
-		//Game over
+		//Life lost, respawn in a bit
+        spawnDelay = 60;
 		break;
+    case Entity::Missile:
 	case Entity::Unknown:
 		break;
 	}
 }
 
+void MainWindow::splitAsteroid(const sf::Vector2f& position, Entity& destroyedEntity) {
+    sf::Vector2f startPos;
+    Asteroid& destroyedAsteroid = dynamic_cast<Asteroid&>(destroyedEntity);
+    
+    Asteroid::Size newSize {Asteroid::Small};
+    
+    if(destroyedAsteroid.getSize() == Asteroid::Small) {
+        return;
+    } else if(destroyedAsteroid.getSize() == Asteroid::Large) {
+        newSize = Asteroid::Medium;
+    }
+    
+	asteroids.emplace_back(new Asteroid(newSize, position));
+    asteroids.emplace_back(new Asteroid(newSize, position));
+}
+
 void MainWindow::resetGame() {
 	destroyEntities();
-	score = 0;
+	score.reset();
 	createShip();
 	createAsteroids();
 }
 
-void MainWindow::prepareScore() {
-	aFont.loadFromFile("Resources/arial.ttf");
-
-	scoreText.setCharacterSize(30);
-	scoreText.setStyle(sf::Text::Regular);
-	scoreText.setFillColor(sf::Color::White);
-}
-
-void MainWindow::updateScore() {
-	std::string scoreString = static_cast<std::ostringstream*>(&(std::ostringstream() << score))->str();
-	scoreText.setString("Score: " + scoreString);
-}
-
 void MainWindow::destroyEntities() {
 
+}
+
+bool MainWindow::isSpawnEmpty()
+{
+    bool empty {true};
+    
+    // Asteroids
+    for(unsigned int i = 0; i < asteroids.size() && empty; i++) {
+		if(GeoMaths::distanceBetweenPoints(asteroids[i]->getSprite().getPosition(), centre) < asteroids[i]->getCollisionRadius() + shipEntity.getCollisionRadius()*4) {
+            empty = false;
+        }
+	}	
+	
+	return empty;
 }

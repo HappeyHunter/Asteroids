@@ -9,6 +9,7 @@
 #define MAINWINDOW_H_
 
 #include "Entity.h"
+#include "ScoreKeeper.h"
 
 #include <SFML/Graphics.hpp>
 #include <string>
@@ -21,8 +22,8 @@ public:
 	int runGame();
 
 public:
-	static const int gameWidth = 600;
-	static const int gameHeight = 600;
+	static const int gameWidth = 800;
+	static const int gameHeight = 800;
 
 private:
     void gameTick();
@@ -35,15 +36,19 @@ private:
 	void updatePositions();
 	void executeShipCommands();
 	void executeDestroyAction(Entity&);
-	int splitLargeAsteroid(sf::Vector2f);
-	int splitMediumAsteroid(sf::Vector2f);
+	void splitAsteroid(const sf::Vector2f&, Entity&);
 	void resetGame();
 	void destroyEntities();
-	void prepareScore();
-	void updateScore();
+    void drawEntity(sf::RenderWindow&, Entity&);
+    bool isSpawnEmpty();
+    void prepareLives();
 
 private:
 	std::vector<bool> shipCommands;
+    ScoreKeeper score;
+    sf::Rect<float> spawnArea;
+    int spawnDelay;
+    sf::Vector2f centre;
 };
 
 #endif /* MAINWINDOW_H_ */

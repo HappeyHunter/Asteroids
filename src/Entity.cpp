@@ -15,16 +15,14 @@
 
 #include <iostream>
 
-Entity::Entity() : velocity(1.0f,0.0f), type(EntityType::Unknown), alive(true)  {
+Entity::Entity() : velocity(1.0f,0.0f), type(EntityType::Unknown), alive(true), scoreValue(0)  {
 
 }
 
 Entity::~Entity() {
 }
 
-void Entity::tick(int delta) {    
-    std::cout << getType() << " is alive: " << isAlive() << std::endl;
-    
+void Entity::tick(int delta) {        
     updatePosition(delta);
 }
 
@@ -67,16 +65,16 @@ void Entity::checkWrapAround() {
 	float xValue = mySprite.getPosition().x;
 	float yValue = mySprite.getPosition().y;
 
-	if(yValue>MainWindow::gameHeight+getCollisionRadius()) {
-		yValue = 0-getCollisionRadius();
-	} else if(yValue<0-getCollisionRadius()) {
-		yValue = MainWindow::gameHeight+getCollisionRadius();
+	if(yValue>MainWindow::gameHeight) {
+		yValue = 0;
+	} else if(yValue<0) {
+		yValue = MainWindow::gameHeight;
 	}
 
-	if(xValue>MainWindow::gameWidth+getCollisionRadius()) {
-		xValue = 0-getCollisionRadius();
-	} else if(xValue<0-getCollisionRadius()) {
-		xValue = MainWindow::gameWidth+getCollisionRadius();
+	if(xValue>MainWindow::gameWidth) {
+		xValue = 0;
+	} else if(xValue<0) {
+		xValue = MainWindow::gameWidth;
 	}
 
 	mySprite.setPosition(xValue, yValue);
@@ -112,4 +110,13 @@ bool Entity::isAlive() {
 Entity::EntityType Entity::getType() {
 	return type;
 }
-    
+
+int Entity::getScoreValue() {
+    return scoreValue;
+}
+
+
+
+
+
+
