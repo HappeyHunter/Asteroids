@@ -183,6 +183,10 @@ void MainWindow::processKeyPress(sf::Event event) {
         if(event.key.code == sf::Keyboard::Space && !reloading) {
             missiles.emplace_back(new Missile(shipEntity.getPosition(), shipEntity.getAngle()+180));
             reloading = true;
+            audio.playSound(AudioController::Weapon_Fire);
+        } else if(event.key.code == sf::Keyboard::Up) {
+            audio.playLoop(AudioController::Ship_Thrusters);
+            shipCommands[event.key.code] = true;
         } else if(event.key.code == sf::Keyboard::BackSpace) {
             resetGame();
         } else if(event.key.code != sf::Keyboard::Unknown) {
@@ -194,6 +198,9 @@ void MainWindow::processKeyPress(sf::Event event) {
 void MainWindow::processKeyRelease(sf::Event event) {
 	if(event.key.code == sf::Keyboard::Space) {
 		reloading = false;
+    } else if(event.key.code == sf::Keyboard::Up) {
+        audio.stopLoop(AudioController::Ship_Thrusters);
+        shipCommands[event.key.code] = false;
 	} else if(event.key.code != sf::Keyboard::Unknown){
 		shipCommands[event.key.code] = false;
 	}
@@ -249,6 +256,7 @@ void MainWindow::checkCollisions() {
             shipEntity.destroyed();
             
             executeDestroyAction(shipEntity);
+            audio.playSound(AudioController::Ship_Destroyed);
         }
     }
 
@@ -263,6 +271,7 @@ void MainWindow::checkCollisions() {
                 asteroids[j]->destroyed();
             
                 executeDestroyAction(*asteroids[j]);
+                audio.playSound(AudioController::Asteroid_Destroyed);
 			}
 		}
 	}
@@ -276,6 +285,7 @@ void MainWindow::executeDestroyAction(Entity& destroyedEntity) {
 		splitAsteroid(destroyedEntity.getPosition(), destroyedEntity);
 		break;
 	case Entity::Ship: //Ship hit
+        audio.stopLoop(AudioController::Ship_Thrusters);
 		//Life lost, respawn in a bit
         spawnDelay = 60;
 		break;

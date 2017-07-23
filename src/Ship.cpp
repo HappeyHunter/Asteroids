@@ -23,7 +23,7 @@ int turnDirection {0};
 sf::Vector2f acceleration {-0.1f, 0.0f};
 
 Ship::Ship() : Entity() {
-    myTextureLocation = "Resources/Ship.png";
+    myTextureLocation += "Ship.png";
 	type = EntityType::Ship;
     velocity *= 0.0f;
 }

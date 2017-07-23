@@ -15,7 +15,7 @@
 
 #include <iostream>
 
-Entity::Entity() : velocity(1.0f,0.0f), type(EntityType::Unknown), alive(true), scoreValue(0)  {
+Entity::Entity() : velocity(1.0f,0.0f), myTextureLocation("Resources/Graphics/"), type(EntityType::Unknown), alive(true), scoreValue(0)   {
 
 }
 

@@ -11,7 +11,7 @@
 #include <sstream>
 
 ScoreKeeper::ScoreKeeper() : score {0}, livesCount{3}, aFont{}, scoreText {"Score: ", aFont} {
-	aFont.loadFromFile("Resources/arial.ttf");
+	aFont.loadFromFile("Resources/Graphics/arial.ttf");
 
 	scoreText.setCharacterSize(30);
 	scoreText.setStyle(sf::Text::Regular);
@@ -22,7 +22,7 @@ ScoreKeeper::ScoreKeeper() : score {0}, livesCount{3}, aFont{}, scoreText {"Scor
 
 void ScoreKeeper::setupLives()
 {
-    lifeTexture.loadFromFile("Resources/Ship.png");
+    lifeTexture.loadFromFile("Resources/Graphics/Ship.png");
     
     for(int i = 0; lives.size() < MAX_LIVES; ++i) {
         lives.emplace_back(sf::Sprite(lifeTexture));

@@ -32,18 +32,18 @@ void Asteroid::setAttributes() {
 
     switch(mySize) {
         case Size::Large :
-            myTextureLocation = "Resources/LargeAsteroid.png";
+            myTextureLocation += "LargeAsteroid.png";
             velocity *= 0.5f;
             scoreValue = 20;
             break;
         case Size::Medium :
-            myTextureLocation = "Resources/MediumAsteroid.png";
+            myTextureLocation += "MediumAsteroid.png";
             velocity *= 1.0f;
             scoreValue = 50;
             break;
         case Size::Small :
-            myTextureLocation = "Resources/SmallAsteroid.png";
-            velocity *= 2.0f;
+            myTextureLocation += "SmallAsteroid.png";
+            velocity *= 1.5f;
             scoreValue = 100;
             break;
     }    

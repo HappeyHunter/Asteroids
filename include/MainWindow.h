@@ -10,6 +10,7 @@
 
 #include "Entity.h"
 #include "ScoreKeeper.h"
+#include "AudioController.h"
 
 #include <SFML/Graphics.hpp>
 #include <string>
@@ -44,6 +45,7 @@ private:
     void prepareLives();
 
 private:
+    AudioController audio;
 	std::vector<bool> shipCommands;
     ScoreKeeper score;
     sf::Rect<float> spawnArea;

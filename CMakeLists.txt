@@ -23,6 +23,7 @@ set (SOURCE_FILES
 	src/Missile.cpp
 	src/ScoreKeeper.cpp
 	src/Ship.cpp
+	src/AudioController.cpp
 	)
 
 file(COPY ${CMAKE_SOURCE_DIR}/Resources DESTINATION ${PROJECT_BINARY_DIR})
