@@ -46,7 +46,7 @@ if(SFML_STATIC_LIBS)
 endif()
 
 # Include the package directories
-include_directories(${SFML_INCLUDE_DIRS})
+include_directories(${SFML_INCLUDE_DIR})
 
 # Create the executable
 add_executable (${PROJECT_NAME} ${SOURCE_FILES})
